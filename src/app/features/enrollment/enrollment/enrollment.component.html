@@ -1,17 +1,28 @@
+<!-- src/app/features/enrollment/enrollment/enrollment.component.html -->
+
 <h2>Inscripción de materias</h2>
 
-<form [formGroup]="form" (ngSubmit)="submit()">
+<!-- Mientras cargamos, mostramos un mensaje -->
+<div *ngIf="isLoading">Cargando materias e inscripciones…</div>
+
+<!-- Solo cuando isLoading === false renderizamos el form -->
+<form
+  *ngIf="!isLoading"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
   <div *ngFor="let s of subjects">
     <label>
-      <input 
+      <input
         type="checkbox"
         [checked]="selectedIds.value.includes(s.id)"
-        (change)="toggleSelection(s.id)" />
+        (change)="toggleSelection(s.id)"
+      />
       {{ s.name }} (Prof: {{ s.professorName }})
     </label>
   </div>
 
-  <!-- Mensajes de validación -->
+  <!-- Mensajes de validación: solo cuando el form esté visible -->
   <div class="error" *ngIf="form.get('selectedIds')?.hasError('required')">
     Debes seleccionar al menos una materia.
   </div>
@@ -23,4 +34,5 @@
   </div>
 
   <button type="submit" [disabled]="form.invalid">Inscribir</button>
+  <button type="button" (click)="cancel()">Cancelar</button>
 </form>

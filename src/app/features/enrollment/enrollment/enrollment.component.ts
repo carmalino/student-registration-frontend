@@ -12,7 +12,7 @@ import {
 import { SubjectService }      from '../../../core/services/subject.service';
 import { StudentService }      from '../../../core/services/student.service';
 import { Subject }             from '../../../models/subject.model';
-import { ActivatedRoute }      from '@angular/router';
+import { ActivatedRoute, Router }      from '@angular/router';
 
 @Component({
   selector: 'app-enrollment',
@@ -24,13 +24,15 @@ import { ActivatedRoute }      from '@angular/router';
 export class EnrollmentComponent implements OnInit {
   subjects: Subject[] = [];
   form: FormGroup;
-  studentId!: number;    // ya no hardcodeado
+  studentId!: number;
+  isLoading = true;
 
   constructor(
     private fb: FormBuilder,
     private subjSvc: SubjectService,
     private studSvc: StudentService,
-    private route: ActivatedRoute   // ← inyectamos ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.form = this.fb.group({
       selectedIds: this.fb.array<number>([], [
@@ -42,22 +44,40 @@ export class EnrollmentComponent implements OnInit {
   }
 
   ngOnInit() {
-    // 1) Capturamos el studentId de los query params
+    // 1) Capturamos studentId de los query params
     this.route.queryParamMap.subscribe(params => {
       const id = params.get('studentId');
-      this.studentId = id ? +id : 0;
-      
-      // 2) Cargamos las inscripciones existentes para ese estudiante
-      if (this.studentId) {
-        this.studSvc.getEnrolled(this.studentId)
-          .subscribe(enrolled =>
-            enrolled.forEach(e => this.toggleSelection(e.subjectId))
-          );
+      if (!id) {
+        alert('Falta parámetro studentId en la URL');
+        this.router.navigate(['/students']);
+        return;
       }
-    });
+      this.studentId = +id;
 
-    // 3) Cargamos el catálogo de materias
-    this.subjSvc.getAll().subscribe(s => this.subjects = s);
+      // 2) Cargamos materias primero
+      this.subjSvc.getAll().subscribe({
+        next: subs => {
+          this.subjects = subs;
+
+          // 3) Luego precargamos las inscripciones
+          this.studSvc.getEnrolled(this.studentId).subscribe({
+            next: enrolled => {
+              enrolled.forEach(e => this.toggleSelection(e.subjectId));
+              // 4) Ya terminamos de cargar
+              this.isLoading = false;
+            },
+            error: () => {
+              alert('Error al cargar inscripciones previas');
+              this.isLoading = false;
+            }
+          });
+        },
+        error: () => {
+          alert('Error al cargar materias');
+          this.isLoading = false;
+        }
+      });
+    });
   }
 
   get selectedIds(): FormArray {
@@ -66,17 +86,18 @@ export class EnrollmentComponent implements OnInit {
 
   toggleSelection(id: number) {
     const idx = this.selectedIds.value.indexOf(id);
-    if (idx >= 0) this.selectedIds.removeAt(idx);
-    else           this.selectedIds.push(this.fb.control(id));
+    if (idx >= 0) {
+      this.selectedIds.removeAt(idx);
+    } else {
+      this.selectedIds.push(this.fb.control(id));
+    }
     this.form.updateValueAndValidity();
   }
 
   uniqueProfessorValidator(control: AbstractControl): ValidationErrors | null {
     const formArray = control as FormArray;
-    const selectedIds: number[] = formArray.value;
-    const profs = selectedIds.map(id => 
-      this.subjects.find(s => s.id === id)!.professorId
-    );
+    const profs = (formArray.value as number[])
+      .map(id => this.subjects.find(s => s.id === id)!.professorId);
     return new Set(profs).size === profs.length
       ? null
       : { repeatedProfessor: true };
@@ -90,7 +111,11 @@ export class EnrollmentComponent implements OnInit {
       subjectIds: this.selectedIds.value
     }).subscribe({
       next: msg => alert(msg),
-      error:   err => alert(err.error || 'Error al inscribir materias')
+      error: err => alert(err.error || 'Error al inscribir materias')
     });
+  }
+
+  cancel() {
+    this.router.navigate(['/students']);
   }
 }

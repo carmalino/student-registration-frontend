@@ -4,6 +4,7 @@ import { CommonModule }      from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import { StudentService }    from '../../../core/services/student.service';
 import { EnrolledSubjectDto } from '../../../models/enrolled-subject.dto';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-classmates',
@@ -20,7 +21,8 @@ export class ClassmatesComponent implements OnInit {
 
   constructor(
     private studSvc: StudentService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
@@ -47,5 +49,9 @@ export class ClassmatesComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  cancel() {
+    this.router.navigate(['/students']);
   }
 }

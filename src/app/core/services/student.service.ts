@@ -42,8 +42,13 @@ export class StudentService {
     return this.http.get<EnrolledSubjectDto[]>(`${this.api}/${id}/subjects`);
   }
 
-  /** Inscribe materias a un estudiante */
+  /** Inscribe materias a un estudiante y devuelve un string */
   enroll(request: EnrollSubjectsRequest): Observable<string> {
-    return this.http.post<string>(`${this.api}/${request.studentId}/enroll-subjects`, request);
+    // responseType:'text' le dice a HttpClient que no haga JSON.parse
+    return this.http.post(
+      `${this.api}/${request.studentId}/enroll-subjects`,
+      request,
+      { responseType: 'text' }
+    );
   }
 }

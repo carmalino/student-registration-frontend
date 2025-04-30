@@ -34,6 +34,13 @@
           <button class="btn btn--small btn--secondary" (click)="enroll(s.id)" [attr.aria-label]="'Inscribir materias a '+ s.name ">
             Inscribir
           </button>
+          <button
+            class="btn btn--small btn--secondary"
+            [routerLink]="['/classmates']"
+            [queryParams]="{ studentId: s.id }"
+          >
+            Compañeros
+          </button>
         </td>
       </tr>
     </tbody>
