@@ -1,0 +1,26 @@
+<h2>Inscripción de materias</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div *ngFor="let s of subjects">
+    <label>
+      <input 
+        type="checkbox"
+        [checked]="selectedIds.value.includes(s.id)"
+        (change)="toggleSelection(s.id)" />
+      {{ s.name }} (Prof: {{ s.professorName }})
+    </label>
+  </div>
+
+  <!-- Mensajes de validación -->
+  <div class="error" *ngIf="form.get('selectedIds')?.hasError('required')">
+    Debes seleccionar al menos una materia.
+  </div>
+  <div class="error" *ngIf="form.get('selectedIds')?.hasError('maxlength')">
+    No puedes seleccionar más de 3 materias.
+  </div>
+  <div class="error" *ngIf="form.get('selectedIds')?.hasError('repeatedProfessor')">
+    No puedes seleccionar dos materias del mismo profesor.
+  </div>
+
+  <button type="submit" [disabled]="form.invalid">Inscribir</button>
+</form>

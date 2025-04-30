@@ -1,0 +1,41 @@
+<section class="student-list">
+  <header class="student-list__header">
+    <h1>Gestión de Estudiantes</h1>
+    <button class="btn btn--primary" routerLink="/students/new" aria-label="Crear nuevo estudiante">
+      + Nuevo Estudiante
+    </button>
+  </header>
+
+  <table class="student-list__table" role="table" aria-label="Lista de estudiantes">
+    <thead role="rowgroup">
+      <tr role="row">
+        <th role="columnheader">Nombre</th>
+        <th role="columnheader">Programa</th>
+        <th role="columnheader">Acciones</th>
+      </tr>
+    </thead>
+    <tbody role="rowgroup">
+      <tr *ngFor="let s of students; let i = index"
+          role="row"
+          [class.student-list__row--even]="i % 2 === 0">
+        <td role="cell">{{ s.name }}</td>
+        <td role="cell">{{ s.program }}</td>
+        <td role="cell" class="student-list__actions">
+          <button
+            [attr.aria-label]="'Editar ' + s.name"
+            (click)="edit(s.id)"
+            class="btn btn--small">
+        Editar
+        </button>
+          
+          <button class="btn btn--small btn--danger" (click)="delete(s.id)" [attr.aria-label]="'Eliminar '+  s.name ">
+            Eliminar
+          </button>
+          <button class="btn btn--small btn--secondary" (click)="enroll(s.id)" [attr.aria-label]="'Inscribir materias a '+ s.name ">
+            Inscribir
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>

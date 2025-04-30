@@ -1,0 +1,29 @@
+<!-- student-form.component.html -->
+<h2>{{ isEdit ? 'Editar Estudiante' : 'Nuevo Estudiante' }}</h2>
+
+<div *ngIf="loading">Cargando datos…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<form [formGroup]="form" (ngSubmit)="submit()" *ngIf="!loading">
+  <div>
+    <label>Nombre:</label>
+    <input formControlName="name" />
+    <div class="error" *ngIf="form.get('name')?.hasError('required')">
+      Requerido.
+    </div>
+  </div>
+
+  <div>
+    <label>Programa:</label>
+    <input formControlName="program" />
+    <div class="error" *ngIf="form.get('program')?.hasError('required')">
+      Requerido.
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="form.invalid">
+    {{ isEdit ? 'Actualizar' : 'Crear' }}
+  </button>
+  <button type="button" (click)="cancel()">Cancelar</button>
+</form>
+

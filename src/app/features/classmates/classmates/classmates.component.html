@@ -1,0 +1,18 @@
+<!-- src/app/features/classmates/classmates/classmates.component.html -->
+<h2>Compañeros de Clase</h2>
+
+<div *ngIf="loading">Cargando compañeros…</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error">
+  <div *ngFor="let item of enrolled" class="subject-block">
+    <h3>{{ item.subjectName }} (Prof: {{ item.professorName }})</h3>
+    <p>
+      Compañeros:
+      <span *ngIf="item.classmates.length; else none">
+        {{ item.classmates.join(', ') }}
+      </span>
+      <ng-template #none>Ninguno</ng-template>
+    </p>
+  </div>
+</div>

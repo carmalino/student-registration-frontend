@@ -1,0 +1,12 @@
+/* src/app/features/classmates/classmates/classmates.component.css */
+.subject-block {
+    border: 1px solid #ccc;
+    padding: 1em;
+    margin-bottom: 1em;
+    border-radius: 4px;
+  }
+  .error {
+    color: red;
+    margin: 1em 0;
+  }
+  
